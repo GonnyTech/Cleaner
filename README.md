@@ -192,7 +192,9 @@ Rimuovi app preinstallate Windows indesiderate:
 
 ## 📜 Licenza
 
-Uso personale e distribuzione libera.
+Questo progetto è rilasciato sotto [Licenza MIT](LICENSE).
+
+Sei libero di usare, modificare e distribuire questo software.
 
 ---
 
