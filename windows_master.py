@@ -234,18 +234,21 @@ class WindowsMaster(ctk.CTk):
         self.btn_remove_bloat.pack(pady=15, padx=40, fill="x")
     
     def setup_optimization_tab(self):
-        frame = self.tab_optimize
-        frame.grid_columnconfigure(0, weight=1)
+        # Create a scrollable frame inside the tab
+        scroll_frame = ctk.CTkScrollableFrame(self.tab_optimize, width=820, height=450)
+        scroll_frame.pack(padx=10, pady=10, fill="both", expand=True)
+        
+        scroll_frame.grid_columnconfigure(0, weight=1)
         
         info = ctk.CTkLabel(
-            frame,
+            scroll_frame,
             text="Ottimizzazioni e Configurazioni:",
             font=ctk.CTkFont(size=14, weight="bold")
         )
         info.pack(pady=(10, 20), padx=20, anchor="w")
         
         # Disable Ads
-        ads_frame = ctk.CTkFrame(frame)
+        ads_frame = ctk.CTkFrame(scroll_frame)
         ads_frame.pack(pady=10, padx=20, fill="x")
         
         ctk.CTkLabel(
@@ -264,7 +267,7 @@ class WindowsMaster(ctk.CTk):
         self.btn_disable_ads.pack(pady=10, padx=15)
         
         # Scheduling
-        sched_frame = ctk.CTkFrame(frame)
+        sched_frame = ctk.CTkFrame(scroll_frame)
         sched_frame.pack(pady=10, padx=20, fill="x")
         
         ctk.CTkLabel(
@@ -297,7 +300,7 @@ class WindowsMaster(ctk.CTk):
         self.btn_disable_sched.pack(side="left", padx=5)
         
         # VS Code Installation
-        vscode_frame = ctk.CTkFrame(frame)
+        vscode_frame = ctk.CTkFrame(scroll_frame)
         vscode_frame.pack(pady=10, padx=20, fill="x")
         
         ctk.CTkLabel(
@@ -306,10 +309,17 @@ class WindowsMaster(ctk.CTk):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(pady=10, padx=15, anchor="w")
         
+        self.btn_install_vscode = ctk.CTkButton(
+            vscode_frame,
+            text="Installa VS Code",
+            command=self.install_vscode,
+            fg_color=PRIMARY_COLOR,
+            hover_color="#1f5fcf"
+        )
         self.btn_install_vscode.pack(pady=10, padx=15)
         
         # Brave Browser Installation
-        brave_frame = ctk.CTkFrame(frame)
+        brave_frame = ctk.CTkFrame(scroll_frame)
         brave_frame.pack(pady=10, padx=20, fill="x")
         
         ctk.CTkLabel(
@@ -433,7 +443,7 @@ class WindowsMaster(ctk.CTk):
                     else:
                         self.log("Rimozione Windows.old...")
                         try:
-                            subprocess.run(["cmd", "/c", f"rd /s /q {path}"], check=True, capture_output=True)
+                            subprocess.run(["cmd", "/c", f"rd /s /q {path}"], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
                             self.log("Windows.old rimosso con successo", "SUCCESS")
                         except Exception as e:
                             self.log(f"Errore rimozione Windows.old: {e}", "ERROR")
@@ -593,7 +603,7 @@ class WindowsMaster(ctk.CTk):
             command = f"Get-AppxPackage *{app_code}* | Remove-AppxPackage"
             
             try:
-                subprocess.run(["powershell", "-Command", command], check=True, capture_output=True)
+                subprocess.run(["powershell", "-Command", command], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
                 self.log(f"✓ {app_name} rimossa con successo", "SUCCESS")
             except:
                 self.log(f"✗ Impossibile rimuovere {app_name}", "ERROR")
@@ -640,7 +650,7 @@ class WindowsMaster(ctk.CTk):
         ]
         
         try:
-            subprocess.run(cmd, check=True, capture_output=True)
+            subprocess.run(cmd, check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
             self.log("Pianificazione attivata: ogni Domenica alle 10:00", "SUCCESS")
         except Exception as e:
             self.log(f"Errore pianificazione: {e}", "ERROR")
@@ -651,7 +661,7 @@ class WindowsMaster(ctk.CTk):
             return
         
         try:
-            subprocess.run(["schtasks", "/delete", "/tn", TASK_NAME, "/f"], check=True, capture_output=True)
+            subprocess.run(["schtasks", "/delete", "/tn", TASK_NAME, "/f"], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
             self.log("Pianificazione disattivata", "SUCCESS")
         except:
             self.log("Nessuna pianificazione trovata", "WARNING")
@@ -669,7 +679,7 @@ class WindowsMaster(ctk.CTk):
                 self.btn_install_vscode.configure(text="⏳ Installazione...")
                 
                 install_cmd = "./VSCodeSetup.exe /VERYSILENT /NORESTART /MERGETASKS=!runcode"
-                subprocess.run(["powershell", "-Command", install_cmd], check=True, capture_output=True)
+                subprocess.run(["powershell", "-Command", install_cmd], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
                 
                 os.remove("VSCodeSetup.exe")
                 self.log("VS Code installato con successo", "SUCCESS")
@@ -689,7 +699,7 @@ class WindowsMaster(ctk.CTk):
                 # Using winget for Brave as it's more reliable for Chromium-based browsers
                 self.log("Installazione Brave via Winget...")
                 install_cmd = "winget install Brave.Brave --silent --accept-package-agreements --accept-source-agreements"
-                result = subprocess.run(["powershell", "-Command", install_cmd], capture_output=True, text=True)
+                result = subprocess.run(["powershell", "-Command", install_cmd], capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
                 
                 if result.returncode == 0:
                     self.log("Brave Browser installato con successo", "SUCCESS")
@@ -697,10 +707,10 @@ class WindowsMaster(ctk.CTk):
                     # Fallback to direct download if winget fails
                     self.log("Winget fallito, provo download diretto...", "WARNING")
                     download_cmd = "Invoke-WebRequest -Uri 'https://laptop-updates.brave.com/latest/winx64' -OutFile 'BraveSetup.exe'"
-                    subprocess.run(["powershell", "-Command", download_cmd], check=True, capture_output=True)
+                    subprocess.run(["powershell", "-Command", download_cmd], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
                     
                     self.log("Esecuzione installer Brave...")
-                    subprocess.run(["./BraveSetup.exe", "/silent", "/install"], check=True)
+                    subprocess.run(["./BraveSetup.exe", "/silent", "/install"], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
                     os.remove("BraveSetup.exe")
                     self.log("Brave Browser installato con successo", "SUCCESS")
                     

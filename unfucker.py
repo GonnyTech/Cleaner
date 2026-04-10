@@ -28,7 +28,7 @@ class WindowsCleaner:
 
     def run_powershell_command(self, command):
         try:
-            subprocess.run(["powershell", "-Command", command], check=True, capture_output=True)
+            subprocess.run(["powershell", "-Command", command], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
             return True
         except subprocess.CalledProcessError:
             return False
@@ -80,7 +80,7 @@ class WindowsCleaner:
             # Using winget for Brave as it's more reliable for Chromium-based browsers
             print("Installing Brave via Winget...")
             install_cmd = "winget install Brave.Brave --silent --accept-package-agreements --accept-source-agreements"
-            result = subprocess.run(["powershell", "-Command", install_cmd], capture_output=True, text=True)
+            result = subprocess.run(["powershell", "-Command", install_cmd], capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
             
             if result.returncode == 0:
                 print("✓ Successfully installed Brave Browser")
@@ -91,7 +91,7 @@ class WindowsCleaner:
                 download_cmd = "Invoke-WebRequest -Uri 'https://laptop-updates.brave.com/latest/winx64' -OutFile 'BraveSetup.exe'"
                 if self.run_powershell_command(download_cmd):
                     print("Running Brave installer...")
-                    subprocess.run(["./BraveSetup.exe", "/silent", "/install"], check=True)
+                    subprocess.run(["./BraveSetup.exe", "/silent", "/install"], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
                     os.remove("BraveSetup.exe")
                     print("✓ Successfully installed Brave Browser")
                     return True
