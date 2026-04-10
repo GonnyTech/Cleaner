@@ -29,6 +29,7 @@ Rimuovi app preinstallate Windows indesiderate:
 - **Disabilita Pubblicità Windows** - Rimuove ads dal menu Start e dalle impostazioni
 - **Pianificazione Automatica** - Pulizia automatica ogni Domenica alle 10:00
 - **Installa VS Code** - Download e installazione automatica di Visual Studio Code
+- **Installa Brave Browser** - Download diretto e veloce di Brave Browser
 
 ### 📊 Log & Report
 - Log in tempo reale con timestamp
@@ -39,7 +40,7 @@ Rimuovi app preinstallate Windows indesiderate:
 
 ## 📥 Download
 
-**Windows Master Utility v1.0**
+**Windows Master Utility v2.0**
 
 📦 [WindowsMaster.exe](dist/WindowsMaster.exe) (14.3 MB)
 
