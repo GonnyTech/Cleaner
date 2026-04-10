@@ -10,9 +10,9 @@ import subprocess
 import winreg
 
 # --- Constants ---
-APP_NAME = "Windows Master Utility"
-APP_VERSION = "v1.0"
-TASK_NAME = "Windows_Master_Auto_Clean"
+APP_NAME = "Windows Unfucker Utility"
+APP_VERSION = "v2.0"
+TASK_NAME = "Windows_Unfucker_Auto_Clean"
 
 # Color Scheme
 PRIMARY_COLOR = "#1f6feb"
@@ -306,14 +306,26 @@ class WindowsMaster(ctk.CTk):
             font=ctk.CTkFont(size=13, weight="bold")
         ).pack(pady=10, padx=15, anchor="w")
         
-        self.btn_install_vscode = ctk.CTkButton(
-            vscode_frame,
-            text="Installa VS Code",
-            command=self.install_vscode,
-            fg_color=PRIMARY_COLOR,
-            hover_color="#1f5fcf"
-        )
         self.btn_install_vscode.pack(pady=10, padx=15)
+        
+        # Brave Browser Installation
+        brave_frame = ctk.CTkFrame(frame)
+        brave_frame.pack(pady=10, padx=20, fill="x")
+        
+        ctk.CTkLabel(
+            brave_frame,
+            text="🌐 Installa Brave Browser",
+            font=ctk.CTkFont(size=13, weight="bold")
+        ).pack(pady=10, padx=15, anchor="w")
+        
+        self.btn_install_brave = ctk.CTkButton(
+            brave_frame,
+            text="Installa Brave",
+            command=self.install_brave,
+            fg_color="#fb8500",
+            hover_color="#ef7000"
+        )
+        self.btn_install_brave.pack(pady=10, padx=15)
     
     def setup_log_tab(self):
         frame = self.tab_log
@@ -665,6 +677,37 @@ class WindowsMaster(ctk.CTk):
                 self.log(f"Errore installazione VS Code: {e}", "ERROR")
             finally:
                 self.btn_install_vscode.configure(state="normal", text="Installa VS Code")
+        
+        threading.Thread(target=download_install, daemon=True).start()
+    
+    def install_brave(self):
+        self.log("Download Brave Browser in corso...")
+        self.btn_install_brave.configure(state="disabled", text="⏳ Download...")
+        
+        def download_install():
+            try:
+                # Using winget for Brave as it's more reliable for Chromium-based browsers
+                self.log("Installazione Brave via Winget...")
+                install_cmd = "winget install Brave.Brave --silent --accept-package-agreements --accept-source-agreements"
+                result = subprocess.run(["powershell", "-Command", install_cmd], capture_output=True, text=True)
+                
+                if result.returncode == 0:
+                    self.log("Brave Browser installato con successo", "SUCCESS")
+                else:
+                    # Fallback to direct download if winget fails
+                    self.log("Winget fallito, provo download diretto...", "WARNING")
+                    download_cmd = "Invoke-WebRequest -Uri 'https://laptop-updates.brave.com/latest/winx64' -OutFile 'BraveSetup.exe'"
+                    subprocess.run(["powershell", "-Command", download_cmd], check=True, capture_output=True)
+                    
+                    self.log("Esecuzione installer Brave...")
+                    subprocess.run(["./BraveSetup.exe", "/silent", "/install"], check=True)
+                    os.remove("BraveSetup.exe")
+                    self.log("Brave Browser installato con successo", "SUCCESS")
+                    
+            except Exception as e:
+                self.log(f"Errore installazione Brave: {e}", "ERROR")
+            finally:
+                self.btn_install_brave.configure(state="normal", text="Installa Brave")
         
         threading.Thread(target=download_install, daemon=True).start()
     

@@ -1,11 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 
+import os
+import customtkinter
+
+ctk_path = os.path.dirname(customtkinter.__file__)
+
 a = Analysis(
     ['windows_master.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[(os.path.join(ctk_path, "assets"), "customtkinter/assets")],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

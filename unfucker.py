@@ -74,6 +74,32 @@ class WindowsCleaner:
             print(f"✗ Error installing VS Code: {str(e)}")
             return False
 
+    def install_brave(self):
+        print("\nInstalling Brave Browser...")
+        try:
+            # Using winget for Brave as it's more reliable for Chromium-based browsers
+            print("Installing Brave via Winget...")
+            install_cmd = "winget install Brave.Brave --silent --accept-package-agreements --accept-source-agreements"
+            result = subprocess.run(["powershell", "-Command", install_cmd], capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                print("✓ Successfully installed Brave Browser")
+                return True
+            else:
+                # Fallback to direct download if winget fails
+                print("Winget failed, trying direct download...")
+                download_cmd = "Invoke-WebRequest -Uri 'https://laptop-updates.brave.com/latest/winx64' -OutFile 'BraveSetup.exe'"
+                if self.run_powershell_command(download_cmd):
+                    print("Running Brave installer...")
+                    subprocess.run(["./BraveSetup.exe", "/silent", "/install"], check=True)
+                    os.remove("BraveSetup.exe")
+                    print("✓ Successfully installed Brave Browser")
+                    return True
+            return False
+        except Exception as e:
+            print(f"✗ Error installing Brave Browser: {str(e)}")
+            return False
+
     def run(self):
         try:
             elevate(graphical=False)
@@ -100,10 +126,14 @@ class WindowsCleaner:
                 disable_ads_flag = choice == 'y'
                 break
 
-        while True:
-            choice = input("\nInstall VS Code? (y/n): ").lower()
             if choice in ['y', 'n']:
                 install_vscode_flag = choice == 'y'
+                break
+
+        while True:
+            choice = input("\nInstall Brave Browser? (y/n): ").lower()
+            if choice in ['y', 'n']:
+                install_brave_flag = choice == 'y'
                 break
 
         print("\nReview selected actions:")
@@ -115,6 +145,8 @@ class WindowsCleaner:
             print("\nWindows Advertisements will be disabled")
         if install_vscode_flag:
             print("VS Code will be installed")
+        if install_brave_flag:
+            print("Brave Browser will be installed")
 
         confirm = input("\nProceed with cleanup? (y/n): ").lower()
         if confirm != 'y':
@@ -128,6 +160,8 @@ class WindowsCleaner:
             self.disable_ads()
         if install_vscode_flag:
             self.install_vscode()
+        if install_brave_flag:
+            self.install_brave()
         
         print("\nCleanup completed!")
         input("\nPress Enter to exit...")
