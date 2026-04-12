@@ -231,7 +231,7 @@ class WindowsMaster(ctk.CTk):
             fg_color=SECONDARY_COLOR,
             hover_color="#7c3aed"
         )
-        btn_select_all.pack(side="left", padx=5)
+        self.btn_select_all.pack(side="left", padx=5)
         
         self.btn_deselect_all = ctk.CTkButton(
             btn_frame,
@@ -241,7 +241,7 @@ class WindowsMaster(ctk.CTk):
             fg_color="#6e7681",
             hover_color="#484f58"
         )
-        btn_deselect_all.pack(side="left", padx=5)
+        self.btn_deselect_all.pack(side="left", padx=5)
         
         self.btn_remove_bloat = ctk.CTkButton(
             frame,
