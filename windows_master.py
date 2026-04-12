@@ -8,6 +8,8 @@ import sys
 import ctypes
 import subprocess
 import winreg
+from utils import get_config, save_config, get_text
+from translations import TRANSLATIONS
 
 # --- Constants ---
 APP_NAME = "Windows Unfucker Utility"
@@ -27,6 +29,10 @@ ctk.set_default_color_theme("blue")
 class WindowsMaster(ctk.CTk):
     def __init__(self):
         super().__init__()
+        
+        # Load config
+        self.config = get_config()
+        self.lang = self.config.get("language", "en")
         
         self.title(f"{APP_NAME} {APP_VERSION}")
         self.geometry("900x650")
@@ -73,21 +79,36 @@ class WindowsMaster(ctk.CTk):
         
         subtitle = ctk.CTkLabel(
             header_frame,
-            text="Complete Windows Cleaning and Optimization",
+            text=get_text('subtitle', self.lang),
             font=ctk.CTkFont(size=13),
             text_color="#c9d1d9"
         )
         subtitle.pack(pady=(0, 15))
+        self.subtitle_label = subtitle # Store for refresh
+        
+        # Language Selector
+        self.lang_var = ctk.StringVar(value=get_text(f'lang_{self.lang}', self.lang))
+        self.lang_menu = ctk.CTkOptionMenu(
+            header_frame,
+            values=[get_text('lang_en', self.lang), get_text('lang_it', self.lang), get_text('lang_fr', self.lang)],
+            variable=self.lang_var,
+            command=self.change_language,
+            width=120,
+            fg_color=SECONDARY_COLOR,
+            button_color=SECONDARY_COLOR,
+            button_hover_color="#7c3aed"
+        )
+        self.lang_menu.place(relx=0.98, rely=0.5, anchor="e")
         
         # Tabview
         self.tabview = ctk.CTkTabview(self, width=860, corner_radius=10)
         self.tabview.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
         
         # Create tabs
-        self.tab_cleaning = self.tabview.add("🧹 System Cleaning")
-        self.tab_bloat = self.tabview.add("🗑️ Remove Bloatware")
-        self.tab_optimize = self.tabview.add("⚙️ Optimizations")
-        self.tab_log = self.tabview.add("📊 Logs & Reports")
+        self.tab_cleaning = self.tabview.add(get_text('tab_cleaning', self.lang))
+        self.tab_bloat = self.tabview.add(get_text('tab_bloat', self.lang))
+        self.tab_optimize = self.tabview.add(get_text('tab_optimize', self.lang))
+        self.tab_log = self.tabview.add(get_text('tab_log', self.lang))
         
         self.setup_cleaning_tab()
         self.setup_bloatware_tab()
@@ -99,17 +120,17 @@ class WindowsMaster(ctk.CTk):
         frame.grid_columnconfigure(0, weight=1)
         
         # Info label
-        info = ctk.CTkLabel(
+        self.cleaning_info_label = ctk.CTkLabel(
             frame,
-            text="Select the cleaning operations to perform:",
+            text=get_text('cleaning_info', self.lang),
             font=ctk.CTkFont(size=14, weight="bold")
         )
-        info.pack(pady=(10, 20), padx=20, anchor="w")
+        self.cleaning_info_label.pack(pady=(10, 20), padx=20, anchor="w")
         
         # Checkboxes
         self.check_recycle = ctk.CTkCheckBox(
             frame, 
-            text="♻️  Empty Recycle Bin",
+            text=get_text('check_recycle', self.lang),
             font=ctk.CTkFont(size=13),
             checkbox_width=22,
             checkbox_height=22
@@ -119,7 +140,7 @@ class WindowsMaster(ctk.CTk):
         
         self.check_downloads = ctk.CTkCheckBox(
             frame,
-            text="📥  Delete obsolete Downloads (> 7 days)",
+            text=get_text('check_downloads', self.lang),
             font=ctk.CTkFont(size=13),
             checkbox_width=22,
             checkbox_height=22
@@ -129,7 +150,7 @@ class WindowsMaster(ctk.CTk):
         
         self.check_temp = ctk.CTkCheckBox(
             frame,
-            text="🗂️  Clean Temporary Files (User + System)",
+            text=get_text('check_temp', self.lang),
             font=ctk.CTkFont(size=13),
             checkbox_width=22,
             checkbox_height=22
@@ -139,7 +160,7 @@ class WindowsMaster(ctk.CTk):
         
         self.check_prefetch = ctk.CTkCheckBox(
             frame,
-            text="⚡  Clean Prefetch (Requires Admin)",
+            text=get_text('check_prefetch', self.lang),
             font=ctk.CTkFont(size=13),
             checkbox_width=22,
             checkbox_height=22
@@ -149,7 +170,7 @@ class WindowsMaster(ctk.CTk):
         
         self.check_windows_old = ctk.CTkCheckBox(
             frame,
-            text="🔧  Delete Windows.old (Requires Admin)",
+            text=get_text('check_windows_old', self.lang),
             font=ctk.CTkFont(size=13),
             checkbox_width=22,
             checkbox_height=22
@@ -159,7 +180,7 @@ class WindowsMaster(ctk.CTk):
         # Action button
         self.btn_clean = ctk.CTkButton(
             frame,
-            text="🚀 START SYSTEM CLEANING",
+            text=get_text('btn_start_cleaning', self.lang),
             command=self.start_cleaning,
             height=50,
             font=ctk.CTkFont(size=16, weight="bold"),
@@ -172,12 +193,12 @@ class WindowsMaster(ctk.CTk):
         frame = self.tab_bloat
         frame.grid_columnconfigure(0, weight=1)
         
-        info = ctk.CTkLabel(
+        self.bloat_info_label = ctk.CTkLabel(
             frame,
-            text="Select the pre-installed apps to remove:",
+            text=get_text('bloat_info', self.lang),
             font=ctk.CTkFont(size=14, weight="bold")
         )
-        info.pack(pady=(10, 15), padx=20, anchor="w")
+        self.bloat_info_label.pack(pady=(10, 15), padx=20, anchor="w")
         
         # Scrollable frame for apps
         scroll_frame = ctk.CTkScrollableFrame(frame, width=800, height=250)
@@ -202,9 +223,9 @@ class WindowsMaster(ctk.CTk):
         btn_frame = ctk.CTkFrame(frame, fg_color="transparent")
         btn_frame.pack(pady=15, padx=20, fill="x")
         
-        btn_select_all = ctk.CTkButton(
+        self.btn_select_all = ctk.CTkButton(
             btn_frame,
-            text="Select All",
+            text=get_text('btn_select_all', self.lang),
             command=self.select_all_bloatware,
             width=150,
             fg_color=SECONDARY_COLOR,
@@ -212,9 +233,9 @@ class WindowsMaster(ctk.CTk):
         )
         btn_select_all.pack(side="left", padx=5)
         
-        btn_deselect_all = ctk.CTkButton(
+        self.btn_deselect_all = ctk.CTkButton(
             btn_frame,
-            text="Deselect All",
+            text=get_text('btn_deselect_all', self.lang),
             command=self.deselect_all_bloatware,
             width=150,
             fg_color="#6e7681",
@@ -224,7 +245,7 @@ class WindowsMaster(ctk.CTk):
         
         self.btn_remove_bloat = ctk.CTkButton(
             frame,
-            text="🗑️ REMOVE SELECTED APPS",
+            text=get_text('btn_remove_bloat', self.lang),
             command=self.start_bloatware_removal,
             height=50,
             font=ctk.CTkFont(size=16, weight="bold"),
@@ -240,26 +261,27 @@ class WindowsMaster(ctk.CTk):
         
         scroll_frame.grid_columnconfigure(0, weight=1)
         
-        info = ctk.CTkLabel(
+        self.optimize_info_label = ctk.CTkLabel(
             scroll_frame,
-            text="Optimizations and Configurations:",
+            text=get_text('optimize_info', self.lang),
             font=ctk.CTkFont(size=14, weight="bold")
         )
-        info.pack(pady=(10, 20), padx=20, anchor="w")
+        self.optimize_info_label.pack(pady=(10, 20), padx=20, anchor="w")
         
         # Disable Ads
         ads_frame = ctk.CTkFrame(scroll_frame)
         ads_frame.pack(pady=10, padx=20, fill="x")
         
-        ctk.CTkLabel(
+        self.title_disable_ads_label = ctk.CTkLabel(
             ads_frame,
-            text="🚫 Disable Windows Ads",
+            text=get_text('title_disable_ads', self.lang),
             font=ctk.CTkFont(size=13, weight="bold")
-        ).pack(pady=10, padx=15, anchor="w")
+        )
+        self.title_disable_ads_label.pack(pady=10, padx=15, anchor="w")
         
         self.btn_disable_ads = ctk.CTkButton(
             ads_frame,
-            text="Disable Ads",
+            text=get_text('btn_disable_ads', self.lang),
             command=self.disable_ads,
             fg_color=WARNING_COLOR,
             hover_color="#d47100"
@@ -270,18 +292,19 @@ class WindowsMaster(ctk.CTk):
         sched_frame = ctk.CTkFrame(scroll_frame)
         sched_frame.pack(pady=10, padx=20, fill="x")
         
-        ctk.CTkLabel(
+        self.title_scheduling_label = ctk.CTkLabel(
             sched_frame,
-            text="📅 Automatic Scheduling (Sunday 10:00 AM)",
+            text=get_text('title_scheduling', self.lang),
             font=ctk.CTkFont(size=13, weight="bold")
-        ).pack(pady=10, padx=15, anchor="w")
+        )
+        self.title_scheduling_label.pack(pady=10, padx=15, anchor="w")
         
         btn_frame = ctk.CTkFrame(sched_frame, fg_color="transparent")
         btn_frame.pack(pady=10, padx=15)
         
         self.btn_enable_sched = ctk.CTkButton(
             btn_frame,
-            text="✅ Activate",
+            text=get_text('btn_activate', self.lang),
             command=self.enable_scheduling,
             width=150,
             fg_color=SUCCESS_COLOR,
@@ -291,7 +314,7 @@ class WindowsMaster(ctk.CTk):
         
         self.btn_disable_sched = ctk.CTkButton(
             btn_frame,
-            text="❌ Deactivate",
+            text=get_text('btn_deactivate', self.lang),
             command=self.disable_scheduling,
             width=150,
             fg_color=DANGER_COLOR,
@@ -303,15 +326,16 @@ class WindowsMaster(ctk.CTk):
         vscode_frame = ctk.CTkFrame(scroll_frame)
         vscode_frame.pack(pady=10, padx=20, fill="x")
         
-        ctk.CTkLabel(
+        self.title_vscode_label = ctk.CTkLabel(
             vscode_frame,
-            text="💻 Install Visual Studio Code",
+            text=get_text('title_vscode', self.lang),
             font=ctk.CTkFont(size=13, weight="bold")
-        ).pack(pady=10, padx=15, anchor="w")
+        )
+        self.title_vscode_label.pack(pady=10, padx=15, anchor="w")
         
         self.btn_install_vscode = ctk.CTkButton(
             vscode_frame,
-            text="Install VS Code",
+            text=get_text('btn_vscode', self.lang),
             command=self.install_vscode,
             fg_color=PRIMARY_COLOR,
             hover_color="#1f5fcf"
@@ -322,15 +346,16 @@ class WindowsMaster(ctk.CTk):
         brave_frame = ctk.CTkFrame(scroll_frame)
         brave_frame.pack(pady=10, padx=20, fill="x")
         
-        ctk.CTkLabel(
+        self.title_brave_label = ctk.CTkLabel(
             brave_frame,
-            text="🌐 Install Brave Browser",
+            text=get_text('title_brave', self.lang),
             font=ctk.CTkFont(size=13, weight="bold")
-        ).pack(pady=10, padx=15, anchor="w")
+        )
+        self.title_brave_label.pack(pady=10, padx=15, anchor="w")
         
         self.btn_install_brave = ctk.CTkButton(
             brave_frame,
-            text="Install Brave",
+            text=get_text('btn_brave', self.lang),
             command=self.install_brave,
             fg_color="#fb8500",
             hover_color="#ef7000"
@@ -342,27 +367,27 @@ class WindowsMaster(ctk.CTk):
         frame.grid_columnconfigure(0, weight=1)
         frame.grid_rowconfigure(1, weight=1)
         
-        info = ctk.CTkLabel(
+        self.log_info_label = ctk.CTkLabel(
             frame,
-            text="📋 Operations Log:",
+            text=get_text('log_info', self.lang),
             font=ctk.CTkFont(size=14, weight="bold")
         )
-        info.grid(row=0, column=0, pady=(10, 10), padx=20, sticky="w")
+        self.log_info_label.grid(row=0, column=0, pady=(10, 10), padx=20, sticky="w")
         
         self.textbox_log = ctk.CTkTextbox(frame, width=820, height=400, font=ctk.CTkFont(size=12))
         self.textbox_log.grid(row=1, column=0, padx=20, pady=(0, 20), sticky="nsew")
         self.textbox_log.configure(state="disabled")
         
         # Clear log button
-        btn_clear = ctk.CTkButton(
+        self.btn_clear_log = ctk.CTkButton(
             frame,
-            text="🗑️ Clear Log",
+            text=get_text('btn_clear_log', self.lang),
             command=self.clear_log,
             width=150,
             fg_color="#6e7681",
             hover_color="#484f58"
         )
-        btn_clear.grid(row=2, column=0, pady=(0, 15))
+        self.btn_clear_log.grid(row=2, column=0, pady=(0, 15))
     
     def log(self, message, level="INFO"):
         icon = "ℹ️" if level == "INFO" else "✅" if level == "SUCCESS" else "⚠️" if level == "WARNING" else "❌"
@@ -400,21 +425,21 @@ class WindowsMaster(ctk.CTk):
         import pythoncom
         pythoncom.CoInitialize()
         
-        self.log("=== SYSTEM CLEANING STARTED ===")
+        self.log(get_text('log_start_cleaning', self.lang))
         is_admin = self.is_admin()
         
         if not is_admin:
-            self.log("ATTENTION: No administrator privileges. Some operations might fail.", "WARNING")
+            self.log(get_text('log_no_admin', self.lang), "WARNING")
         
         try:
             # Recycle Bin
             if self.check_recycle.get():
-                self.log("Emptying Recycle Bin...")
+                self.log(get_text('log_emptying_recycle', self.lang))
                 try:
                     winshell.recycle_bin().empty(confirm=False, show_progress=False, sound=False)
-                    self.log("Recycle Bin emptied successfully", "SUCCESS")
+                    self.log(get_text('log_recycle_success', self.lang), "SUCCESS")
                 except Exception as e:
-                    self.log(f"Error emptying recycle bin: {e}", "ERROR")
+                    self.log(f"{get_text('log_recycle_error', self.lang)}: {e}", "ERROR")
             
             # Downloads
             if self.check_downloads.get():
@@ -432,34 +457,34 @@ class WindowsMaster(ctk.CTk):
                 if is_admin:
                     self.clean_folder("C:\\Windows\\Prefetch", label="Prefetch", days=0)
                 else:
-                    self.log("SKIP: Prefetch requires Admin privileges", "WARNING")
+                    self.log(get_text('log_prefetch_skip', self.lang), "WARNING")
             
             # Windows.old
             if self.check_windows_old.get():
                 path = "C:\\Windows.old"
                 if os.path.exists(path):
                     if not is_admin:
-                        self.log("SKIP: Windows.old requires Admin privileges", "WARNING")
+                        self.log(get_text('log_prefetch_skip', self.lang), "WARNING")
                     else:
-                        self.log("Removing Windows.old...")
+                        self.log(get_text('log_winold_removing', self.lang))
                         try:
                             subprocess.run(["cmd", "/c", f"rd /s /q {path}"], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
-                            self.log("Windows.old successfully removed", "SUCCESS")
+                            self.log(get_text('log_winold_success', self.lang), "SUCCESS")
                         except Exception as e:
-                            self.log(f"Error removing Windows.old: {e}", "ERROR")
+                            self.log(f"{get_text('log_winold_error', self.lang)}: {e}", "ERROR")
                 else:
-                    self.log("Windows.old not found", "INFO")
+                    self.log(get_text('log_winold_not_found', self.lang), "INFO")
             
-            self.log("=== CLEANING COMPLETED ===", "SUCCESS")
+            self.log(get_text('log_cleaning_complete', self.lang), "SUCCESS")
         finally:
-            self.btn_clean.configure(state="normal", text="🚀 START SYSTEM CLEANING")
+            self.btn_clean.configure(state="normal", text=get_text('btn_start_cleaning', self.lang))
     
     def clean_folder(self, path, days=0, label=""):
         if not path or not os.path.exists(path):
-            self.log(f"Folder {label} not found", "WARNING")
+            self.log(f"{get_text('folder_not_found', self.lang)}: {label}", "WARNING")
             return
         
-        self.log(f"Cleaning {label}...")
+        self.log(f"{get_text('cleaning_folder', self.lang)} {label}...")
         cutoff = datetime.datetime.now() - datetime.timedelta(days=days)
         count = 0
         
@@ -477,7 +502,7 @@ class WindowsMaster(ctk.CTk):
                             count += 1
                 except:
                     pass
-            self.log(f"{label}: Removed {count} items", "SUCCESS")
+            self.log(f"{label}: {get_text('removed_items', self.lang)} {count}", "SUCCESS")
         except Exception as e:
             self.log(f"Error cleaning {label}: {e}", "ERROR")
     
@@ -487,11 +512,11 @@ class WindowsMaster(ctk.CTk):
         selected = {name: code for name, code in self.bloatware_apps.items() if self.bloatware_vars[name].get()}
         
         if not selected:
-            self.log("No apps selected for removal", "WARNING")
+            self.log(get_text('log_no_apps_selected', self.lang), "WARNING")
             return
         
         if not self.is_admin():
-            self.log("ERROR: Administrator privileges required to remove bloatware", "ERROR")
+            self.log(get_text('log_admin_required_bloat', self.lang), "ERROR")
             return
         
         # Show confirmation dialog
@@ -500,7 +525,7 @@ class WindowsMaster(ctk.CTk):
     def show_confirmation_dialog(self, selected_apps):
         # Create modal dialog
         dialog = ctk.CTkToplevel(self)
-        dialog.title("⚠️ Confirm Removal")
+        dialog.title(get_text('dialog_confirm_title', self.lang))
         dialog.geometry("500x550")
         dialog.resizable(False, False)
         
@@ -520,7 +545,7 @@ class WindowsMaster(ctk.CTk):
         
         ctk.CTkLabel(
             warning_frame,
-            text="⚠️ CAUTION",
+            text=get_text('dialog_caution', self.lang),
             font=ctk.CTkFont(size=20, weight="bold"),
             text_color="white"
         ).pack(pady=15)
@@ -528,7 +553,7 @@ class WindowsMaster(ctk.CTk):
         # Message
         ctk.CTkLabel(
             dialog,
-            text="You are about to remove the following applications:",
+            text=get_text('dialog_remove_msg', self.lang),
             font=ctk.CTkFont(size=14, weight="bold")
         ).pack(pady=(20, 10), padx=20)
         
@@ -547,7 +572,7 @@ class WindowsMaster(ctk.CTk):
         # Warning message
         ctk.CTkLabel(
             dialog,
-            text="This operation CANNOT be undone!",
+            text=get_text('dialog_irreversible', self.lang),
             font=ctk.CTkFont(size=12, weight="bold"),
             text_color=DANGER_COLOR
         ).pack(pady=(10, 5))
@@ -558,17 +583,17 @@ class WindowsMaster(ctk.CTk):
         
         def on_cancel():
             dialog.destroy()
-            self.log("Removal cancelled by user", "INFO")
+            self.log(get_text('log_removal_cancelled', self.lang), "INFO")
         
         def on_confirm():
             dialog.destroy()
-            self.btn_remove_bloat.configure(state="disabled", text="⏳ Removal in progress...")
+            self.btn_remove_bloat.configure(state="disabled", text=get_text('log_removal_in_progress', self.lang))
             threading.Thread(target=self.remove_bloatware, args=(selected_apps,), daemon=True).start()
         
         # Cancel button
         btn_cancel = ctk.CTkButton(
             btn_frame,
-            text="❌ Cancel",
+            text=get_text('btn_cancel', self.lang),
             command=on_cancel,
             width=150,
             height=40,
@@ -581,7 +606,7 @@ class WindowsMaster(ctk.CTk):
         # Confirm button
         btn_confirm = ctk.CTkButton(
             btn_frame,
-            text="✅ Confirm Removal",
+            text=get_text('btn_confirm_removal', self.lang),
             command=on_confirm,
             width=200,
             height=40,
@@ -595,30 +620,30 @@ class WindowsMaster(ctk.CTk):
         import pythoncom
         pythoncom.CoInitialize()
         
-        self.log("=== BLOATWARE REMOVAL STARTED ===")
+        self.log(get_text('log_bloat_start', self.lang))
         total = len(selected_apps)
         
         for i, (app_name, app_code) in enumerate(selected_apps.items(), 1):
-            self.log(f"[{i}/{total}] Removing {app_name}...")
+            self.log(f"[{i}/{total}] {get_text('log_removing', self.lang)} {app_name}...")
             command = f"Get-AppxPackage *{app_code}* | Remove-AppxPackage"
             
             try:
                 subprocess.run(["powershell", "-Command", command], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
-                self.log(f"✓ {app_name} successfully removed", "SUCCESS")
+                self.log(f"✓ {app_name} {get_text('log_removed_success', self.lang)}", "SUCCESS")
             except:
-                self.log(f"✗ Unable to remove {app_name}", "ERROR")
+                self.log(f"✗ {get_text('log_removed_error', self.lang)} {app_name}", "ERROR")
         
-        self.log("=== BLOATWARE REMOVAL COMPLETED ===", "SUCCESS")
-        self.btn_remove_bloat.configure(state="normal", text="🗑️ REMOVE SELECTED APPS")
+        self.log(get_text('log_bloat_complete', self.lang), "SUCCESS")
+        self.btn_remove_bloat.configure(state="normal", text=get_text('btn_remove_bloat', self.lang))
     
     # ===== OPTIMIZATIONS =====
     
     def disable_ads(self):
         if not self.is_admin():
-            self.log("ERROR: Administrator privileges required", "ERROR")
+            self.log(get_text('log_admin_required_bloat', self.lang), "ERROR")
             return
         
-        self.log("Disabling Windows ads...")
+        self.log(get_text('log_disable_ads', self.lang))
         self.btn_disable_ads.configure(state="disabled")
         
         try:
@@ -631,15 +656,15 @@ class WindowsMaster(ctk.CTk):
                 winreg.SetValueEx(key, "DisableWindowsConsumerFeatures", 0, winreg.REG_DWORD, 1)
                 winreg.CloseKey(key)
             
-            self.log("Windows ads successfully disabled", "SUCCESS")
+            self.log(get_text('log_ads_success', self.lang), "SUCCESS")
         except Exception as e:
-            self.log(f"Error disabling ads: {e}", "ERROR")
+            self.log(f"{get_text('log_ads_error', self.lang)}: {e}", "ERROR")
         finally:
             self.btn_disable_ads.configure(state="normal")
     
     def enable_scheduling(self):
         if not self.is_admin():
-            self.log("ERROR: Administrator privileges required", "ERROR")
+            self.log(get_text('log_admin_required_bloat', self.lang), "ERROR")
             return
         
         exe_path = sys.executable if not getattr(sys, 'frozen', False) else sys.executable
@@ -651,72 +676,72 @@ class WindowsMaster(ctk.CTk):
         
         try:
             subprocess.run(cmd, check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
-            self.log("Scheduling activated: every Sunday at 10:00 AM", "SUCCESS")
+            self.log(get_text('log_sched_active', self.lang), "SUCCESS")
         except Exception as e:
             self.log(f"Scheduling error: {e}", "ERROR")
     
     def disable_scheduling(self):
         if not self.is_admin():
-            self.log("ERROR: Administrator privileges required", "ERROR")
+            self.log(get_text('log_admin_required_bloat', self.lang), "ERROR")
             return
         
         try:
             subprocess.run(["schtasks", "/delete", "/tn", TASK_NAME, "/f"], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
-            self.log("Scheduling deactivated", "SUCCESS")
+            self.log(get_text('log_sched_inactive', self.lang), "SUCCESS")
         except:
-            self.log("No scheduling found", "WARNING")
+            self.log(get_text('log_sched_not_found', self.lang), "WARNING")
     
     def install_vscode(self):
-        self.log("Downloading VS Code...")
-        self.btn_install_vscode.configure(state="disabled", text="⏳ Downloading...")
+        self.log(get_text('log_vscode_download', self.lang))
+        self.btn_install_vscode.configure(state="disabled", text=get_text('btn_downloading', self.lang))
         
         def download_install():
             try:
                 download_cmd = "Invoke-WebRequest -Uri 'https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user' -OutFile 'VSCodeSetup.exe'"
                 subprocess.run(["powershell", "-Command", download_cmd], check=True, capture_output=True)
                 
-                self.log("Installing VS Code...")
-                self.btn_install_vscode.configure(text="⏳ Installing...")
+                self.log(get_text('log_vscode_install', self.lang))
+                self.btn_install_vscode.configure(text=get_text('btn_installing', self.lang))
                 
                 install_cmd = "./VSCodeSetup.exe /VERYSILENT /NORESTART /MERGETASKS=!runcode"
                 subprocess.run(["powershell", "-Command", install_cmd], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
                 
                 os.remove("VSCodeSetup.exe")
-                self.log("VS Code successfully installed", "SUCCESS")
+                self.log(get_text('log_vscode_success', self.lang), "SUCCESS")
             except Exception as e:
-                self.log(f"Error installing VS Code: {e}", "ERROR")
+                self.log(f"{get_text('log_vscode_error', self.lang)}: {e}", "ERROR")
             finally:
-                self.btn_install_vscode.configure(state="normal", text="Installa VS Code")
+                self.btn_install_vscode.configure(state="normal", text=get_text('btn_vscode', self.lang))
         
         threading.Thread(target=download_install, daemon=True).start()
     
     def install_brave(self):
-        self.log("Downloading Brave Browser...")
-        self.btn_install_brave.configure(state="disabled", text="⏳ Downloading...")
+        self.log(get_text('log_brave_download', self.lang))
+        self.btn_install_brave.configure(state="disabled", text=get_text('btn_downloading', self.lang))
         
         def download_install():
             try:
                 # Using winget for Brave as it's more reliable for Chromium-based browsers
-                self.log("Installing Brave via Winget...")
+                self.log(get_text('log_brave_winget', self.lang))
                 install_cmd = "winget install Brave.Brave --silent --accept-package-agreements --accept-source-agreements"
                 result = subprocess.run(["powershell", "-Command", install_cmd], capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
                 
                 if result.returncode == 0:
-                    self.log("Brave Browser successfully installed", "SUCCESS")
+                    self.log(get_text('log_brave_success', self.lang), "SUCCESS")
                 else:
                     # Fallback to direct download if winget fails
-                    self.log("Winget failed, trying direct download...", "WARNING")
+                    self.log(get_text('log_brave_fallback', self.lang), "WARNING")
                     download_cmd = "Invoke-WebRequest -Uri 'https://laptop-updates.brave.com/latest/winx64' -OutFile 'BraveSetup.exe'"
                     subprocess.run(["powershell", "-Command", download_cmd], check=True, capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
                     
-                    self.log("Running Brave installer...")
+                    self.log(get_text('log_brave_download', self.lang))
                     subprocess.run(["./BraveSetup.exe", "/silent", "/install"], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
                     os.remove("BraveSetup.exe")
-                    self.log("Brave Browser successfully installed", "SUCCESS")
+                    self.log(get_text('log_brave_success', self.lang), "SUCCESS")
             except Exception as e:
-                self.log(f"Error installing Brave: {e}", "ERROR")
+                self.log(f"{get_text('log_brave_error', self.lang)}: {e}", "ERROR")
             finally:
-                self.btn_install_brave.configure(state="normal", text="Installa Brave")
+                self.btn_install_brave.configure(state="normal", text=get_text('btn_brave', self.lang))
         
         threading.Thread(target=download_install, daemon=True).start()
     
@@ -725,6 +750,65 @@ class WindowsMaster(ctk.CTk):
             return ctypes.windll.shell32.IsUserAnAdmin()
         except:
             return False
+
+    def change_language(self, language_display):
+        # Map display name to code
+        lang_map = {
+            get_text('lang_en', self.lang): 'en',
+            get_text('lang_it', self.lang): 'it',
+            get_text('lang_fr', self.lang): 'fr'
+        }
+        new_lang = lang_map.get(language_display, 'en')
+        
+        if new_lang == self.lang:
+            return
+            
+        self.lang = new_lang
+        self.config["language"] = self.lang
+        save_config(self.config)
+        
+        # Refresh UI
+        self.refresh_ui()
+
+    def refresh_ui(self):
+        # Update tab names
+        # Note: ctk Tabview doesn't have a direct rename for tabs easily without re-creating 
+        # but we can try to access the buttons. Actually the easiest is to update labels we kept.
+        # For simplicity, we'll focus on the labels/buttons we stored.
+        
+        self.subtitle_label.configure(text=get_text('subtitle', self.lang))
+        
+        # We need to recreate or update tab titles. 
+        # In CustomTkinter, it's better to update the labels inside the tabs.
+        self.cleaning_info_label.configure(text=get_text('cleaning_info', self.lang))
+        self.check_recycle.configure(text=get_text('check_recycle', self.lang))
+        self.check_downloads.configure(text=get_text('check_downloads', self.lang))
+        self.check_temp.configure(text=get_text('check_temp', self.lang))
+        self.check_prefetch.configure(text=get_text('check_prefetch', self.lang))
+        self.check_windows_old.configure(text=get_text('check_windows_old', self.lang))
+        self.btn_clean.configure(text=get_text('btn_start_cleaning', self.lang))
+        
+        self.bloat_info_label.configure(text=get_text('bloat_info', self.lang))
+        self.btn_select_all.configure(text=get_text('btn_select_all', self.lang))
+        self.btn_deselect_all.configure(text=get_text('btn_deselect_all', self.lang))
+        self.btn_remove_bloat.configure(text=get_text('btn_remove_bloat', self.lang))
+        
+        self.optimize_info_label.configure(text=get_text('optimize_info', self.lang))
+        self.title_disable_ads_label.configure(text=get_text('title_disable_ads', self.lang))
+        self.btn_disable_ads.configure(text=get_text('btn_disable_ads', self.lang))
+        self.title_scheduling_label.configure(text=get_text('title_scheduling', self.lang))
+        self.btn_enable_sched.configure(text=get_text('btn_activate', self.lang))
+        self.btn_disable_sched.configure(text=get_text('btn_deactivate', self.lang))
+        self.title_vscode_label.configure(text=get_text('title_vscode', self.lang))
+        self.btn_install_vscode.configure(text=get_text('btn_vscode', self.lang))
+        self.title_brave_label.configure(text=get_text('title_brave', self.lang))
+        self.btn_install_brave.configure(text=get_text('btn_brave', self.lang))
+        
+        self.log_info_label.configure(text=get_text('log_info', self.lang))
+        self.btn_clear_log.configure(text=get_text('btn_clear_log', self.lang))
+        
+        # Update dropdown values
+        self.lang_menu.configure(values=[get_text('lang_en', self.lang), get_text('lang_it', self.lang), get_text('lang_fr', self.lang)])
 
 if __name__ == "__main__":
     app = WindowsMaster()

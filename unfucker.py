@@ -2,9 +2,13 @@ import subprocess
 import winreg
 import os
 from elevate import elevate
+from utils import get_config, save_config, get_text
+from translations import TRANSLATIONS
 
 class WindowsCleaner:
     def __init__(self):
+        self.config = get_config()
+        self.lang = self.config.get("language", "en")
         self.apps = {
             "Microsoft ToDo": "Microsoft.ToDo",
             "Mail and Calendar": "Microsoft.WindowsCommunicationsApps",
@@ -36,15 +40,15 @@ class WindowsCleaner:
     def remove_bloatware(self, selected_apps):
         total = len(selected_apps)
         for i, (app_name, app_code) in enumerate(selected_apps.items(), 1):
-            print(f"[{i}/{total}] Removing {app_name}...")
+            print(f"[{i}/{total}] {get_text('log_removing', self.lang)} {app_name}...")
             command = f"Get-AppxPackage *{app_code}* | Remove-AppxPackage"
             if self.run_powershell_command(command):
-                print(f"✓ Successfully removed {app_name}")
+                print(f"✓ {app_name} {get_text('log_removed_success', self.lang)}")
             else:
-                print(f"✗ Failed to remove {app_name}")
+                print(f"✗ {get_text('log_removed_error', self.lang)} {app_name}")
 
     def disable_ads(self):
-        print("\nDisabling advertisements...")
+        print(f"\n{get_text('log_disable_ads', self.lang)}")
         try:
             paths = [
                 r"SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager",
@@ -54,86 +58,86 @@ class WindowsCleaner:
                 key = winreg.CreateKeyEx(winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_ALL_ACCESS)
                 winreg.SetValueEx(key, "DisableWindowsConsumerFeatures", 0, winreg.REG_DWORD, 1)
                 winreg.CloseKey(key)
-            print("✓ Successfully disabled advertisements")
+            print(f"✓ {get_text('log_ads_success', self.lang)}")
         except Exception as e:
-            print(f"✗ Failed to disable advertisements: {str(e)}")
+            print(f"✗ {get_text('log_ads_error', self.lang)}: {str(e)}")
 
     def install_vscode(self):
-        print("\nInstalling VS Code...")
+        print(f"\n{get_text('log_vscode_install', self.lang)}")
         try:
             download_command = "Invoke-WebRequest -Uri 'https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user' -OutFile 'VSCodeSetup.exe'"
             if self.run_powershell_command(download_command):
                 install_command = "./VSCodeSetup.exe /VERYSILENT /NORESTART /MERGETASKS=!runcode"
                 if self.run_powershell_command(install_command):
-                    print("✓ Successfully installed VS Code")
+                    print(f"✓ {get_text('log_vscode_success', self.lang)}")
                     os.remove("VSCodeSetup.exe")
                     return True
-            print("✗ Failed to install VS Code")
+            print(f"✗ {get_text('log_vscode_error', self.lang)}")
             return False
         except Exception as e:
-            print(f"✗ Error installing VS Code: {str(e)}")
+            print(f"✗ {get_text('log_vscode_error', self.lang)}: {str(e)}")
             return False
 
     def install_brave(self):
-        print("\nInstalling Brave Browser...")
+        print(f"\n{get_text('log_brave_download', self.lang)}")
         try:
             # Using winget for Brave as it's more reliable for Chromium-based browsers
-            print("Installing Brave via Winget...")
+            print(f"{get_text('log_brave_winget', self.lang)}")
             install_cmd = "winget install Brave.Brave --silent --accept-package-agreements --accept-source-agreements"
             result = subprocess.run(["powershell", "-Command", install_cmd], capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW)
             
             if result.returncode == 0:
-                print("✓ Successfully installed Brave Browser")
+                print(f"✓ {get_text('log_brave_success', self.lang)}")
                 return True
             else:
                 # Fallback to direct download if winget fails
-                print("Winget failed, trying direct download...")
+                print(f"{get_text('log_brave_fallback', self.lang)}")
                 download_cmd = "Invoke-WebRequest -Uri 'https://laptop-updates.brave.com/latest/winx64' -OutFile 'BraveSetup.exe'"
                 if self.run_powershell_command(download_cmd):
-                    print("Running Brave installer...")
+                    print(f"{get_text('log_brave_download', self.lang)}")
                     subprocess.run(["./BraveSetup.exe", "/silent", "/install"], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
                     os.remove("BraveSetup.exe")
-                    print("✓ Successfully installed Brave Browser")
+                    print(f"✓ {get_text('log_brave_success', self.lang)}")
                     return True
             return False
         except Exception as e:
-            print(f"✗ Error installing Brave Browser: {str(e)}")
+            print(f"✗ {get_text('log_brave_error', self.lang)}: {str(e)}")
             return False
 
     def run(self):
         try:
             elevate(graphical=False)
         except Exception:
-            print("Error: Administrator privileges required!")
+            print(get_text('log_admin_required_bloat', self.lang))
             return
 
         print("Windows System Unfucker v1.0 by Samuele Gonnella")
         print("=" * 48)
         
         selected_apps = {}
-        print("\nSelect apps to remove (y/n):")
+        print(f"\n{get_text('bloat_info', self.lang)}")
         for app_name, app_code in self.apps.items():
             while True:
-                choice = input(f"Remove {app_name}? (y/n): ").lower()
+                choice = input(f"{get_text('log_removing', self.lang)} {app_name}? (y/n): ").lower()
                 if choice in ['y', 'n']:
                     if choice == 'y':
                         selected_apps[app_name] = app_code
                     break
 
         while True:
-            choice = input("\nDisable Windows Advertisements? (y/n): ").lower()
+            choice = input(f"\n{get_text('title_disable_ads', self.lang)}? (y/n): ").lower()
             if choice in ['y', 'n']:
                 disable_ads_flag = choice == 'y'
                 break
 
         while True:
-            choice = input("\nInstall Visual Studio Code? (y/n): ").lower()
+            choice = input(f"\n{get_text('title_vscode', self.lang)}? (y/n): ").lower()
             if choice in ['y', 'n']:
                 install_vscode_flag = choice == 'y'
                 break
 
         while True:
-            choice = input("\nInstall Brave Browser? (y/n): ").lower()
+            choice = input(f"\n{get_text('title_brave', self.lang)}? (y/n): ").lower()
             if choice in ['y', 'n']:
                 install_brave_flag = choice == 'y'
                 break
@@ -150,12 +154,12 @@ class WindowsCleaner:
         if install_brave_flag:
             print("Brave Browser will be installed")
 
-        confirm = input("\nProceed with cleanup? (y/n): ").lower()
+        confirm = input(f"\n{get_text('dialog_confirm_title', self.lang)}? (y/n): ").lower()
         if confirm != 'y':
-            print("Operation cancelled.")
+            print(get_text('log_removal_cancelled', self.lang))
             return
 
-        print("\nStarting cleanup...")
+        print(f"\n{get_text('log_cleaning_in_progress', self.lang)}")
         if selected_apps:
             self.remove_bloatware(selected_apps)
         if disable_ads_flag:
@@ -165,7 +169,7 @@ class WindowsCleaner:
         if install_brave_flag:
             self.install_brave()
         
-        print("\nCleanup completed!")
+        print(f"\n{get_text('log_cleaning_complete', self.lang)}")
         input("\nPress Enter to exit...")
 
 def main():
