@@ -126,6 +126,8 @@ class WindowsCleaner:
                 disable_ads_flag = choice == 'y'
                 break
 
+        while True:
+            choice = input("\nInstall Visual Studio Code? (y/n): ").lower()
             if choice in ['y', 'n']:
                 install_vscode_flag = choice == 'y'
                 break

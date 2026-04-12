@@ -48,42 +48,42 @@ class App(ctk.CTk):
         # Tabs
         self.tabview = ctk.CTkTabview(self, width=660)
         self.tabview.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
-        self.tabview.add("Pulizia")
-        self.tabview.add("Pianificazione")
+        self.tabview.add("Cleaning")
+        self.tabview.add("Scheduling")
         self.tabview.add("Log")
 
-        # --- Tab: Pulizia ---
-        self.frame_cleaning = self.tabview.tab("Pulizia")
+        # --- Tab: Cleaning ---
+        self.frame_cleaning = self.tabview.tab("Cleaning")
         self.frame_cleaning.grid_columnconfigure(0, weight=1)
         
-        self.check_recycle = ctk.CTkCheckBox(self.frame_cleaning, text="Svuota Cestino")
+        self.check_recycle = ctk.CTkCheckBox(self.frame_cleaning, text="Empty Recycle Bin")
         self.check_recycle.grid(row=0, column=0, padx=20, pady=10, sticky="w")
         self.check_recycle.select()
 
-        self.check_downloads = ctk.CTkCheckBox(self.frame_cleaning, text="Cancella Download (> 7 giorni)")
+        self.check_downloads = ctk.CTkCheckBox(self.frame_cleaning, text="Clean Downloads (> 7 days)")
         self.check_downloads.grid(row=1, column=0, padx=20, pady=10, sticky="w")
         self.check_downloads.select()
 
-        self.check_temp = ctk.CTkCheckBox(self.frame_cleaning, text="Pulisci File Temporanei (User & System)")
+        self.check_temp = ctk.CTkCheckBox(self.frame_cleaning, text="Clean Temporary Files (User & System)")
         self.check_temp.grid(row=2, column=0, padx=20, pady=10, sticky="w")
         self.check_temp.select()
 
-        self.check_prefetch = ctk.CTkCheckBox(self.frame_cleaning, text="Pulisci Cartella Prefetch (Richiede Admin)")
+        self.check_prefetch = ctk.CTkCheckBox(self.frame_cleaning, text="Clean Prefetch Folder (Requires Admin)")
         self.check_prefetch.grid(row=3, column=0, padx=20, pady=10, sticky="w")
         self.check_prefetch.select()
 
-        self.check_windows_old = ctk.CTkCheckBox(self.frame_cleaning, text="Cancella Windows.old (Richiede Admin)")
+        self.check_windows_old = ctk.CTkCheckBox(self.frame_cleaning, text="Clean Windows.old (Requires Admin)")
         self.check_windows_old.grid(row=4, column=0, padx=20, pady=10, sticky="w")
         
-        # --- Tab: Pianificazione ---
-        self.frame_sched = self.tabview.tab("Pianificazione")
-        self.label_sched = ctk.CTkLabel(self.frame_sched, text="Programma la pulizia automatica settimanale (Domenica ore 10:00)")
+        # --- Tab: Scheduling ---
+        self.frame_sched = self.tabview.tab("Scheduling")
+        self.label_sched = ctk.CTkLabel(self.frame_sched, text="Schedule automatic weekly cleaning (Sunday at 10:00 AM)")
         self.label_sched.pack(padx=20, pady=20)
 
-        self.btn_enable_sched = ctk.CTkButton(self.frame_sched, text="Attiva Pulizia Automatica", command=self.enable_scheduling)
+        self.btn_enable_sched = ctk.CTkButton(self.frame_sched, text="Activate Automatic Cleaning", command=self.enable_scheduling)
         self.btn_enable_sched.pack(padx=20, pady=10)
 
-        self.btn_disable_sched = ctk.CTkButton(self.frame_sched, text="Disattiva Pulizia Automatica", command=self.disable_scheduling, fg_color="red", hover_color="#8B0000")
+        self.btn_disable_sched = ctk.CTkButton(self.frame_sched, text="Deactivate Automatic Cleaning", command=self.disable_scheduling, fg_color="red", hover_color="#8B0000")
         self.btn_disable_sched.pack(padx=20, pady=10)
 
         # --- Tab: Log ---
@@ -92,7 +92,7 @@ class App(ctk.CTk):
         self.textbox_log.configure(state="disabled")
 
         # Action Button
-        self.btn_clean = ctk.CTkButton(self, text="AVVIA PULIZIA ORA", command=self.start_cleaning_thread, height=50, font=ctk.CTkFont(size=16, weight="bold"))
+        self.btn_clean = ctk.CTkButton(self, text="START CLEANING NOW", command=self.start_cleaning_thread, height=50, font=ctk.CTkFont(size=16, weight="bold"))
         self.btn_clean.grid(row=2, column=0, padx=20, pady=20)
 
     def log(self, message):
@@ -111,31 +111,31 @@ class App(ctk.CTk):
     def perform_cleaning_sync(self):
         import pythoncom
         pythoncom.CoInitialize()
-        self.log("--- INIZIO PULIZIA ---")
+        self.log("--- CLEANING STARTED ---")
         
         # Admin check for critical tasks
         is_admin = self.is_admin()
 
         # 1. Recycle Bin
         if self.auto_mode or self.check_recycle.get():
-            self.log("Svuotando il Cestino...")
+            self.log("Emptying the Recycle Bin...")
             try:
                 winshell.recycle_bin().empty(confirm=False, show_progress=False, sound=False)
-                self.log("Cestino svuotato.")
+                self.log("Recycle Bin emptied.")
             except Exception as e:
-                self.log(f"Errore Cestino: {e}")
+                self.log(f"Recycle Bin Error: {e}")
 
         # 2. Downloads (> 7 days)
         if self.auto_mode or self.check_downloads.get():
-            self.clean_folder(os.path.join(os.path.expanduser("~"), "Downloads"), days=7, label="Download")
+            self.clean_folder(os.path.join(os.path.expanduser("~"), "Downloads"), days=7, label="Downloads")
 
         # 3. Temp Files
         if self.auto_mode or self.check_temp.get():
             # User Temp
-            self.clean_folder(os.environ.get('TEMP'), label="Temp Utente", days=0)
+            self.clean_folder(os.environ.get('TEMP'), label="User Temp", days=0)
             # System Temp
             if is_admin:
-                self.clean_folder("C:\\Windows\\Temp", label="Temp Sistema", days=0)
+                self.clean_folder("C:\\Windows\\Temp", label="System Temp", days=0)
 
         # 4. Prefetch
         if (self.auto_mode or self.check_prefetch.get()) and is_admin:
@@ -146,26 +146,26 @@ class App(ctk.CTk):
             path = "C:\\Windows.old"
             if os.path.exists(path):
                 if not is_admin:
-                    self.log("SKIP: Windows.old richiede Admin.")
+                    self.log("SKIP: Windows.old requires Admin.")
                 else:
-                    self.log("Cancellazione Windows.old in corso...")
+                    self.log("Deleting Windows.old in progress...")
                     try:
                         # Use shell 'rd' for speed and to handle locks better if possible
                         subprocess.run(["cmd", "/c", f"rd /s /q {path}"], check=True)
-                        self.log("Windows.old rimosso.")
+                        self.log("Windows.old removed.")
                     except Exception as e:
-                        self.log(f"Errore Windows.old: {e}")
+                        self.log(f"Windows.old Error: {e}")
 
-        self.log("--- PULIZIA COMPLETATA ---")
+        self.log("--- CLEANING COMPLETED ---")
         if not self.auto_mode:
             self.btn_clean.configure(state="normal")
 
     def clean_folder(self, path, days=0, label=""):
         if not path or not os.path.exists(path):
-            self.log(f"Cartella {label} non trovata.")
+            self.log(f"Folder {label} not found.")
             return
 
-        self.log(f"Pulizia {label}...")
+        self.log(f"Cleaning {label}...")
         cutoff = datetime.datetime.now() - datetime.timedelta(days=days)
         count = 0
         
@@ -182,11 +182,11 @@ class App(ctk.CTk):
                         count += 1
             except Exception:
                 pass # Usually busy files
-        self.log(f"{label}: Rimossi {count} elementi.")
+        self.log(f"{label}: Removed {count} items.")
 
     def enable_scheduling(self):
         if not self.is_admin():
-            self.log("ERRORE: Devi eseguire come Admin per pianificare.")
+            self.log("ERROR: You must run as Admin to schedule.")
             return
 
         exe_path = sys.executable if not getattr(sys, 'frozen', False) else sys.executable
@@ -198,19 +198,19 @@ class App(ctk.CTk):
         ]
         try:
             subprocess.run(cmd, check=True, capture_output=True)
-            self.log("Pianificazione attivata: ogni Domenica alle 10:00.")
+            self.log("Scheduling activated: every Sunday at 10:00 AM.")
         except Exception as e:
-            self.log(f"Errore pianificazione: {e}")
+            self.log(f"Scheduling Error: {e}")
 
     def disable_scheduling(self):
         if not self.is_admin():
-            self.log("ERRORE: Devi eseguire come Admin per disattivare.")
+            self.log("ERROR: You must run as Admin to deactivate.")
             return
         try:
             subprocess.run(["schtasks", "/delete", "/tn", TASK_NAME, "/f"], check=True, capture_output=True)
-            self.log("Pianificazione disattivata.")
+            self.log("Scheduling deactivated.")
         except Exception as e:
-            self.log(f"Pianificazione non trovata o errore: {e}")
+            self.log(f"Scheduling not found or error: {e}")
 
     def is_admin(self):
         try:

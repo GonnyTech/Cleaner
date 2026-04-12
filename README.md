@@ -1,210 +1,210 @@
 # 🚀 Windows Master Utility
 
-**La soluzione completa per pulizia e ottimizzazione Windows**
+**The complete solution for Windows cleaning and optimization**
 
-Applicazione all-in-one per mantenere il tuo PC Windows pulito, veloce e ottimizzato.
+An all-in-one application to keep your Windows PC clean, fast, and optimized.
 
 ---
 
-## ✨ Caratteristiche
+## ✨ Features
 
-### 🧹 Pulizia Sistema
-- **Svuota Cestino** - Elimina tutti i file dal Cestino
-- **Cancella Download Obsoleti** - Rimuove file più vecchi di 7 giorni dalla cartella Download
-- **Pulisci File Temporanei** - Elimina file temporanei utente e di sistema
-- **Pulisci Prefetch** - Ottimizza i tempi di avvio (richiede Admin)
-- **Cancella Windows.old** - Recupera spazio eliminando vecchie installazioni Windows
+### 🧹 System Cleaning
+- **Empty Recycle Bin** - Deletes all files from the Recycle Bin
+- **Delete Obsolete Downloads** - Removes files older than 7 days from the Downloads folder
+- **Clean Temporary Files** - Deletes user and system temporary files
+- **Clean Prefetch** - Optimizes startup times (requires Admin)
+- **Delete Windows.old** - Reclaims space by deleting old Windows installations
 
-### 🗑️ Rimuovi Bloatware
-Rimuovi app preinstallate Windows indesiderate:
+### 🗑️ Remove Bloatware
+Remove unwanted pre-installed Windows apps:
 - Microsoft Edge, ToDo, Mail, Camera, People
 - Paint 3D, Clipchamp, DevHome
 - Notepad, Sticky Notes, Get Started
 - **Microsoft Copilot**
 - **Microsoft Recall**
 
-**Dialogo di conferma** mostra sempre l'elenco delle app prima della rimozione.
+**Confirmation dialog** always shows the list of apps before removal.
 
-### ⚙️ Ottimizzazioni
-- **Disabilita Pubblicità Windows** - Rimuove ads dal menu Start e dalle impostazioni
-- **Pianificazione Automatica** - Pulizia automatica ogni Domenica alle 10:00
-- **Installa VS Code** - Download e installazione automatica di Visual Studio Code
-- **Installa Brave Browser** - Download diretto e veloce di Brave Browser
+### ⚙️ Optimizations
+- **Disable Windows Ads** - Removes ads from the Start menu and settings
+- **Automatic Scheduling** - Automatic cleaning every Sunday at 10:00 AM
+- **Install VS Code** - Automatic download and installation of Visual Studio Code
+- **Install Brave Browser** - Automatic download and installation of Brave Browser
 
-### 📊 Log & Report
-- Log in tempo reale con timestamp
-- Icone di stato (✅ ⚠️ ❌)
-- Monitoraggio operazioni completate
+### 📊 Logs & Reports
+- Real-time logging with timestamps
+- Status icons (✅ ⚠️ ❌)
+- Monitoring of completed operations
 
 ---
 
 ## 📥 Download
 
-**Windows Master Utility v2.0**
+**Windows Master Utility v1.0**
 
 📦 [WindowsMaster.exe](dist/WindowsMaster.exe) (14.3 MB)
 
 ---
 
-## 🚀 Installazione & Uso
+## 🚀 Installation & Usage
 
-### Requisiti
-- Windows 10 o Windows 11
-- **Privilegi di Amministratore** (raccomandato per tutte le funzionalità)
+### Requirements
+- Windows 10 or Windows 11
+- **Administrator Privileges** (recommended for all features)
 
 ### Quick Start
 
-1. **Download** - Scarica `WindowsMaster.exe`
-2. **Click Destro** sul file → Seleziona **"Esegui come amministratore"**
-3. **Conferma UAC** - Approva la richiesta di elevazione privilegi
-4. L'applicazione si aprirà con 4 schede disponibili
+1. **Download** - Download `WindowsMaster.exe`
+2. **Right Click** on the file → Select **"Run as administrator"**
+3. **UAC Confirmation** - Approve the permission elevation request
+4. The application will open with 4 available tabs
 
 ---
 
-## 📖 Guida all'Uso
+## 📖 Usage Guide
 
-### Scheda 🧹 Pulizia Sistema
+### 🧹 System Cleaning Tab
 
-1. Seleziona le operazioni desiderate (di default tutte selezionate)
-2. Click su **"🚀 AVVIA PULIZIA SISTEMA"**
-3. Attendi il completamento
-4. Controlla i risultati nella scheda "📊 Log & Report"
+1. Select the desired operations (all selected by default)
+2. Click on **"🚀 START SYSTEM CLEANING"**
+3. Wait for completion
+4. Check results in the "📊 Logs & Reports" tab
 
-### Scheda 🗑️ Rimuovi Bloatware
+### 🗑️ Remove Bloatware Tab
 
-1. Scorri la lista e seleziona le app da rimuovere
-2. Usa **"Seleziona Tutto"** per selezionare tutte le app
-3. Click su **"🗑️ RIMUOVI APP SELEZIONATE"**
-4. **Conferma** nel dialogo che mostra l'elenco delle app
-5. Attendi il completamento della rimozione
+1. Scroll through the list and select the apps to remove
+2. Use **"Select All"** to select all apps
+3. Click on **"🗑️ REMOVE SELECTED APPS"**
+4. **Confirm** in the dialog showing the list of apps
+5. Wait for removal completion
 
-> ⚠️ **ATTENZIONE**: La rimozione delle app è **irreversibile**!
+> ⚠️ **CAUTION**: App removal is **irreversible**!
 
-### Scheda ⚙️ Ottimizzazioni
+### ⚙️ Optimizations Tab
 
-**Disabilita Pubblicità:**
-- Click su "Disabilita Pubblicità" (una tantum)
+**Disable Ads:**
+- Click on "Disable Ads" (one-time action)
 
-**Pianificazione Automatica:**
-- Click "✅ Attiva" per abilitare pulizia settimanale
-- Click "❌ Disattiva" per rimuovere la pianificazione
+**Automatic Scheduling:**
+- Click "✅ Activate" to enable weekly cleaning
+- Click "❌ Deactivate" to remove the schedule
 
-**Installa VS Code:**
-- Click "Installa VS Code" per download e installazione automatici
+**Install VS Code / Brave:**
+- Click the respective button for automatic download and installation
 
-### Scheda 📊 Log & Report
+### 📊 Logs & Reports Tab
 
-- Visualizza in tempo reale tutte le operazioni
-- Ogni riga ha timestamp e icona di stato
-- Click "🗑️ Pulisci Log" per cancellare il log
+- View all operations in real-time
+- Each line includes a timestamp and status icon
+- Click "🗑️ Clean Log" to clear the log
 
 ---
 
-## ⚠️ Avvertenze Importanti
+## ⚠️ Important Warnings
 
 > [!IMPORTANT]
-> **Backup Consigliato**: Prima di usare questo tool, crea un punto di ripristino Windows.
+> **Recommended Backup**: Before using this tool, create a Windows restore point.
 > 
-> Pannello di Controllo → Sistema → Protezione sistema → Crea
+> Control Panel → System → System Protection → Create
 
 > [!WARNING]
-> **Bloatware Removal**: Rimuovere alcune app di sistema (es. Microsoft Edge) potrebbe causare malfunzionamenti. Usa con cautela.
+> **Bloatware Removal**: Removing some system apps (e.g., Microsoft Edge) might cause malfunctions. Use with caution.
 
 > [!CAUTION]
-> **Windows.old**: Cancellare Windows.old è **irreversibile**. Assicurati di non aver bisogno di rollback.
+> **Windows.old**: Deleting Windows.old is **irreversible**. Ensure you do not need to rollback.
 
 ---
 
-## 🎯 Utilizzo Raccomandato
+## 🎯 Recommended Usage
 
-### Prima Esecuzione
-1. **Crea punto di ripristino** Windows
-2. Esegui come **Amministratore**
-3. Vai alla scheda "⚙️ Ottimizzazioni"
-4. Disabilita pubblicità (una volta)
-5. Attiva pianificazione settimanale
+### First Run
+1. **Create a Windows restore point**
+2. Run as **Administrator**
+3. Go to the "⚙️ Optimizations" tab
+4. Disable ads (one-time)
+5. Activate weekly scheduling
 
-### Pulizia Mensile Manuale
-1. Scheda "🧹 Pulizia Sistema"
-2. Seleziona tutte le opzioni
-3. Avvia pulizia
-4. Controlla log per spazio liberato
+### Manual Monthly Cleaning
+1. "🧹 System Cleaning" tab
+2. Select all options
+3. Start cleaning
+4. Check log for reclaimed space
 
-### Setup Nuovo PC
-1. Esegui come Admin
-2. Scheda "🗑️ Rimuovi Bloatware"
-3. Seleziona app indesiderate
-4. Conferma rimozione
-5. Scheda "⚙️ Ottimizzazioni"
-6. Disabilita ads + pianifica pulizia
+### New PC Setup
+1. Run as Admin
+2. "🗑️ Remove Bloatware" tab
+3. Select unwanted apps
+4. Confirm removal
+5. "⚙️ Optimizations" tab
+6. Disable ads + schedule cleaning
 
 ---
 
-## 🛠️ Dettagli Tecnici
+## 🛠️ Technical Details
 
-**Tecnologie:**
+**Technologies:**
 - Python 3.14
 - CustomTkinter (UI)
-- WinShell (Cestino)
+- WinShell (Recycle Bin)
 - WinReg (Registry)
 - PyInstaller (Build)
 
-**Dimensione:** ~14 MB (include Python runtime e librerie)
+**Size:** ~14 MB (includes Python runtime and libraries)
 
-**Admin Elevation:** UAC richiesto all'avvio (`--uac-admin` flag)
+**Admin Elevation:** UAC required at startup (`--uac-admin` flag)
 
 ---
 
 ## 📝 Changelog
 
-### v1.0 (Febbraio 2026)
-- ✅ Pulizia completa sistema (Cestino, Downloads, Temp, Prefetch, Windows.old)
-- ✅ Rimozione bloatware con dialogo di conferma
-- ✅ Disabilita pubblicità Windows
-- ✅ Pianificazione automatica settimanale
-- ✅ Installazione VS Code
-- ✅ UI moderna con tema dark e gradienti
-- ✅ Log dettagliato con timestamp e icone
+### v1.0 (February 2026)
+- ✅ Full system cleaning (Recycle Bin, Downloads, Temp, Prefetch, Windows.old)
+- ✅ Bloatware removal with confirmation dialog
+- ✅ Disable Windows ads
+- ✅ Automatic weekly scheduling
+- ✅ VS Code installation
+- ✅ Modern UI with dark theme and gradients
+- ✅ Detailed log with timestamps and icons
 
 ---
 
-## 🆘 Risoluzione Problemi
+## 🆘 Troubleshooting
 
-**L'app non si avvia:**
-- Verifica di avere Windows 10/11
-- Esegui come Amministratore
-- Disabilita temporaneamente l'antivirus
+**The app does not start:**
+- Verify you have Windows 10/11
+- Run as Administrator
+- Temporarily disable antivirus
 
-**"Alcune operazioni sono fallite":**
-- Assicurati di eseguire come Amministratore
-- Chiudi programmi che potrebbero bloccare file temporanei
+**"Some operations failed":**
+- Ensure you are running as Administrator
+- Close programs that might be blocking temporary files
 
-**La pianificazione non funziona:**
-- Deve essere eseguita come Amministratore
-- Verifica in "Utilità di pianificazione" → Cerca "Windows_Master_Auto_Clean"
+**Scheduling does not work:**
+- Must be run as Administrator
+- Check in "Task Scheduler" → Look for "Windows_Master_Auto_Clean"
 
 ---
 
-## 👨‍💻 Autore
+## 👨‍💻 Author
 
 **Samuele Gonnella**
 
 ---
 
-## 📜 Licenza
+## 📜 License
 
-Questo progetto è rilasciato sotto [Licenza MIT](LICENSE).
+This project is released under the [MIT License](LICENSE).
 
-Sei libero di usare, modificare e distribuire questo software.
-
----
-
-## ⭐ Supporto
-
-Se trovi utile questo tool, considera di:
-- Condividerlo con amici e colleghi
-- Segnalare bug o suggerimenti
+You are free to use, modify, and distribute this software.
 
 ---
 
-**Windows Master Utility** - Mantieni il tuo PC pulito e veloce! 🚀
+## ⭐ Support
+
+If you find this tool useful, consider:
+- Sharing it with friends and colleagues
+- Reporting bugs or suggestions
+
+---
+
+**Windows Master Utility** - Keep your PC clean and fast! 🚀
